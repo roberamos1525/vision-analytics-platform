@@ -1,0 +1,25 @@
+# NOTE: not run locally (Docker is not installed on the development machine).
+# Usage: cp .env.example .env  (set VAP_API_KEYS), then `docker compose up --build`.
+services:
+  vap:
+    build: .
+    image: vision-analytics-platform:0.1.0
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      VAP_SERVER__HOST: 0.0.0.0
+      VAP_STORAGE__STATE_DIR: /var/lib/vap
+      VAP_MEDIA__ROOTS: '["/media/vap"]'
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - vap-state:/var/lib/vap
+      - ./media:/media/vap:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  vap-state:

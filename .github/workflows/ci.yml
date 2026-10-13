@@ -1,0 +1,63 @@
+# Local file only: this workflow has not been executed (no remote repository).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - name: Install (pinned)
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install --no-deps -e .
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Byte-compile
+        run: python -m compileall -q src
+      - name: Test (with OpenCV)
+        run: python -m pytest -q
+      - name: Test (OpenCV blocked, numpy paths only)
+        run: python -c "import sys; sys.modules['cv2'] = None; import pytest; raise SystemExit(pytest.main(['-q']))"
+      - name: Evaluation regression gate
+        run: vap evaluate --request examples/configs/evaluation_request.json --min-mota 0.5
+
+  minimal-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install core only (no OpenCV / SciPy)
+        run: |
+          python -m pip install -e .
+          python -m pip install pytest httpx2
+      - name: Test
+        run: python -m pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t vision-analytics-platform:ci .
