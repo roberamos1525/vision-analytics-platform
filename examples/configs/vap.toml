@@ -1,0 +1,39 @@
+# Example configuration file. Load with: vap serve --config examples/configs/vap.toml
+# or VAP_CONFIG=examples/configs/vap.toml. Environment variables override every value
+# (VAP_<SECTION>__<FIELD>, e.g. VAP_SERVER__PORT=9000). Secrets belong in the environment:
+#   VAP_API_KEYS="<key>:admin,<key>:viewer"   VAP_WEBHOOK_SECRET="<secret>"
+
+[server]
+host = "127.0.0.1"
+port = 8080
+max_request_bytes = 2097152      # JSON bodies
+max_upload_bytes = 209715200     # model uploads (PUT /v1/models/...)
+max_image_pixels = 25000000
+
+[auth]
+enabled = true                   # keys come from VAP_API_KEYS
+
+[storage]
+state_dir = "var"                # SQLite db, snapshots, models, exports
+event_retention_days = 30
+
+[pipelines]
+max_pipelines = 8
+image_backend = "auto"           # auto | numpy | opencv
+metrics_interval_s = 5.0
+snapshot_quality = 85
+preview_quality = 70
+
+[webhooks]
+urls = []                        # e.g. ["https://hooks.example.com/vap"]
+timeout_s = 5.0
+max_retries = 3
+allow_private_networks = false   # SSRF guard; set true only for trusted local receivers
+event_types = []                 # empty = all types
+
+[media]
+roots = []                       # directories allowed for file / image-sequence sources
+
+[logging]
+level = "info"
+format = "json"

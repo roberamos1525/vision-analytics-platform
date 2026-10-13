@@ -1,0 +1,28 @@
+{
+  "detector": {
+    "kind": "background",
+    "engine": "gaussian",
+    "warmup_frames": 20,
+    "warmup_stride": 2,
+    "min_area": 40
+  },
+  "tracker": {"kind": "sort", "iou_threshold": 0.3, "min_hits": 3, "max_age": 10},
+  "zones": [
+    {"zone_id": "entrance", "name": "Entrance", "points": [[0.0, 0.0], [0.35, 0.0], [0.35, 1.0], [0.0, 1.0]], "normalized": true},
+    {"zone_id": "checkout", "name": "Checkout", "points": [[0.65, 0.5], [1.0, 0.5], [1.0, 1.0], [0.65, 1.0]], "normalized": true}
+  ],
+  "lines": [
+    {"line_id": "doorway", "name": "Doorway", "points": [[0.5, 0.0], [0.5, 1.0]], "normalized": true}
+  ],
+  "rules": [
+    {"kind": "zone_intrusion", "rule_id": "entered-checkout", "zone_id": "checkout", "cooldown_s": 5},
+    {"kind": "line_crossing", "rule_id": "doorway-count", "line_id": "doorway", "direction": "any", "severity": "info"},
+    {"kind": "loitering", "rule_id": "loiter-entrance", "zone_id": "entrance", "min_dwell_s": 4, "severity": "critical"},
+    {"kind": "crowding", "rule_id": "crowded", "min_count": 3, "min_duration_s": 1.0, "cooldown_s": 30}
+  ],
+  "process_every_n": 1,
+  "realtime": false,
+  "heatmap": true,
+  "flow_every_n": 10,
+  "pixels_per_meter": 40
+}

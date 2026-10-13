@@ -1,0 +1,8 @@
+{
+  "scene": {"kind": "synthetic", "num_frames": 200, "num_objects": 4, "seed": 3, "noise_std": 2.0},
+  "detector": {"kind": "background", "warmup_frames": 20, "warmup_stride": 2},
+  "tracker": {"kind": "sort", "min_hits": 3, "max_age": 10},
+  "iou_thresholds": [0.3, 0.5, 0.75],
+  "tracking_iou": 0.5,
+  "backend": "auto"
+}
